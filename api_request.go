@@ -26,15 +26,17 @@ func (c *deadlinedConn) Write(b []byte) (n int, err error) {
 
 func newDeadlineTransport(timeout time.Duration) *http.Transport {
 	transport := &http.Transport{
-		DisableKeepAlives: true,
-		Dial: func(netw, addr string) (net.Conn, error) {
-			c, err := net.DialTimeout(netw, addr, timeout)
-			if err != nil {
-				return nil, err
-			}
-			return &deadlinedConn{timeout, c}, nil
-		},
+		DialContext: (&net.Dialer{
+			Timeout:   timeout,
+			KeepAlive: 60 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		ResponseHeaderTimeout: timeout,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
 	}
+
 	return transport
 }
 
