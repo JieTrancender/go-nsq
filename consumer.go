@@ -327,6 +327,11 @@ func (r *Consumer) ChangeMaxInFlight(maxInFlight int) {
 	}
 }
 
+// set lookupd http client
+func (r *Consumer) SetLookupdHttpClient(httpclient *http.Client) {
+	r.lookupdHttpClient = httpclient
+}
+
 // ConnectToNSQLookupd adds an nsqlookupd address to the list for this Consumer instance.
 //
 // If it is the first to be added, it initiates an HTTP request to discover nsqd
@@ -356,21 +361,24 @@ func (r *Consumer) ConnectToNSQLookupd(addr string) error {
 		}
 	}
 	r.lookupdHTTPAddrs = append(r.lookupdHTTPAddrs, parsedAddr)
-	transport := &http.Transport{
-		DialContext: (&net.Dialer{
+	if r.lookupdHttpClient == nil {
+		transport := &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   r.config.LookupdPollTimeout,
+				KeepAlive: r.config.LookupdPollAliveDuration,
+				DualStack: true,
+			}).DialContext,
+			ResponseHeaderTimeout: r.config.LookupdPollTimeout,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+		}
+		r.lookupdHttpClient = &http.Client{
+			Transport: transport,
 			Timeout:   r.config.LookupdPollTimeout,
-			KeepAlive: r.config.LookupdPollAliveDuration,
-			DualStack: true,
-		}).DialContext,
-		ResponseHeaderTimeout: r.config.LookupdPollTimeout,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
+		}
 	}
-	r.lookupdHttpClient = &http.Client{
-		Transport: transport,
-		Timeout:   r.config.LookupdPollTimeout,
-	}
+
 	numLookupd := len(r.lookupdHTTPAddrs)
 	r.mtx.Unlock()
 
