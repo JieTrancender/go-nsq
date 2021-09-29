@@ -365,8 +365,7 @@ func (r *Consumer) ConnectToNSQLookupd(addr string) error {
 		transport := &http.Transport{
 			DialContext: (&net.Dialer{
 				Timeout:   r.config.LookupdPollTimeout,
-				KeepAlive: r.config.LookupdPollAliveDuration,
-				DualStack: true,
+				KeepAlive: 30 * time.Second,
 			}).DialContext,
 			ResponseHeaderTimeout: r.config.LookupdPollTimeout,
 			MaxIdleConns:          100,

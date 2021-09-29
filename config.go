@@ -108,10 +108,9 @@ type Config struct {
 	//
 	// NOTE: when not using nsqlookupd, LookupdPollInterval represents the duration of time between
 	// reconnection attempts
-	LookupdPollInterval      time.Duration `opt:"lookupd_poll_interval" min:"10ms" max:"5m" default:"60s"`
-	LookupdPollJitter        float64       `opt:"lookupd_poll_jitter" min:"0" max:"1" default:"0.3"`
-	LookupdPollAliveDuration time.Duration `opt:"lookupd_pool_alive_duration" default:"60s"`
-	LookupdPollTimeout       time.Duration `opt:"lookupd_poll_timeout" default:"6s"`
+	LookupdPollInterval time.Duration `opt:"lookupd_poll_interval" min:"10ms" max:"5m" default:"60s"`
+	LookupdPollJitter   float64       `opt:"lookupd_poll_jitter" min:"0" max:"1" default:"0.3"`
+	LookupdPollTimeout  time.Duration `opt:"lookupd_poll_timeout" default:"1m"`
 
 	// Maximum duration when REQueueing (for doubling of deferred requeue)
 	MaxRequeueDelay     time.Duration `opt:"max_requeue_delay" min:"0" max:"60m" default:"15m"`

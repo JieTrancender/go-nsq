@@ -24,22 +24,6 @@ func (c *deadlinedConn) Write(b []byte) (n int, err error) {
 	return c.Conn.Write(b)
 }
 
-func newDeadlineTransport(timeout time.Duration) *http.Transport {
-	transport := &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   timeout,
-			KeepAlive: 60 * time.Second,
-			DualStack: true,
-		}).DialContext,
-		ResponseHeaderTimeout: timeout,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-	}
-
-	return transport
-}
-
 type wrappedResp struct {
 	Status     string      `json:"status_txt"`
 	StatusCode int         `json:"status_code"`
