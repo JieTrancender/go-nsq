@@ -173,7 +173,7 @@ conforming to standard library logging conventions.
 
 #### Misc.
 
-Un-exported `NewDeadlineTransport` and `ApiRequest`, which never should have been exported in the
+Un-exported `ApiRequest`, which never should have been exported in the
 first place.
 
 `nsq.Message` serialization switched away from `binary.{Read,Write}` for performance and
